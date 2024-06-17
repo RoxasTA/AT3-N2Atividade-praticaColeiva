@@ -18,7 +18,7 @@ class LibraryServer {
 
     public static void main(String[] args) {
 
-        final int PORT = 1337;
+        final int PORT = 1223;
 
         try {
             ServerSocket serverSocket = new ServerSocket(PORT);

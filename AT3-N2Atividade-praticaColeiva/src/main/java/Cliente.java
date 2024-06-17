@@ -8,145 +8,142 @@ import java.util.Scanner;
 public class Cliente {
 
     private static final String HOST = "localhost";
-    private static final int PORTA = 1337;
+    private static final int PORT = 1337;
 
-    private static final String OPCAO_LISTAR_LIVROS = "1";
-    private static final String OPCAO_ALUGAR_LIVRO = "2";
-    private static final String OPCAO_DEVOLVER_LIVRO = "3";
-    private static final String OPCAO_CADASTRAR_LIVRO = "4";
-    private static final String OPCAO_SAIR = "5";
+    private static final String OPTION_LIST_BOOKS = "1";
+    private static final String OPTION_RENT_BOOK = "2";
+    private static final String OPTION_RETURN_BOOK = "3";
+    private static final String OPTION_REGISTER_BOOK = "4";
+    private static final String OPTION_EXIT = "5";
 
-    private static final String COMANDO_LISTAR = "listar";
-    private static final String COMANDO_ALUGAR = "alugar";
-    private static final String COMANDO_DEVOLVER = "devolver";
-    private static final String COMANDO_CADASTRAR = "cadastrar";
-    private static final String COMANDO_SAIR = "sair";
+    private static final String COMMAND_LIST = "list";
+    private static final String COMMAND_RENT = "rent";
+    private static final String COMMAND_RETURN = "return";
+    private static final String COMMAND_REGISTER = "register";
+    private static final String COMMAND_EXIT = "exit";
 
-    //main
+    // Main
     public static void main(String[] args) {
-        try (Socket socket = new Socket(HOST, PORTA);
-             BufferedReader leitorServidor = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-             PrintWriter escritorServidor = new PrintWriter(socket.getOutputStream(), true);
+        try (Socket socket = new Socket(HOST, PORT);
+             BufferedReader serverReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+             PrintWriter serverWriter = new PrintWriter(socket.getOutputStream(), true);
              Scanner scanner = new Scanner(System.in)) {
 
-            String opcaoUsuario;
+            String userOption;
             do {
-                exibirMenu();
-                opcaoUsuario = scanner.nextLine().trim();
+                displayMenu();
+                userOption = scanner.nextLine().trim();
 
-                switch (opcaoUsuario) {
-                    case OPCAO_LISTAR_LIVROS:
-                        listarLivros(escritorServidor, leitorServidor);
+                switch (userOption) {
+                    case OPTION_LIST_BOOKS:
+                        listBooks(serverWriter, serverReader);
                         break;
-                    case OPCAO_ALUGAR_LIVRO:
-                        alugarLivro(escritorServidor, leitorServidor, scanner);
+                    case OPTION_RENT_BOOK:
+                        rentBook(serverWriter, serverReader, scanner);
                         break;
-                    case OPCAO_DEVOLVER_LIVRO:
-                        devolverLivro(escritorServidor, leitorServidor, scanner);
+                    case OPTION_RETURN_BOOK:
+                        returnBook(serverWriter, serverReader, scanner);
                         break;
-                    case OPCAO_CADASTRAR_LIVRO:
-                        cadastrarLivro(escritorServidor, leitorServidor, scanner);
+                    case OPTION_REGISTER_BOOK:
+                        registerBook(serverWriter, serverReader, scanner);
                         break;
-                    case OPCAO_SAIR:
-                        escritorServidor.println(COMANDO_SAIR);
-                        System.out.println("Saindo...");
+                    case OPTION_EXIT:
+                        serverWriter.println(COMMAND_EXIT);
+                        System.out.println("Exiting...");
                         break;
                     default:
-                        System.out.println("Opção inválida.");
+                        System.out.println("Invalid option.");
                 }
-            } while (!opcaoUsuario.equals(OPCAO_SAIR));
+            } while (!userOption.equals(OPTION_EXIT));
 
         } catch (IOException e) {
-            System.err.println("Erro de I/O: " + e.getMessage());
+            System.err.println("I/O Error: " + e.getMessage());
         }
     }
 
-    // Método para exibir o menu
-    private static void exibirMenu() {
-        System.out.println("Biblioteca:");
-        System.out.println("1. Listar livros");
-        System.out.println("2. Alugar livro");
-        System.out.println("3. Devolver livro");
-        System.out.println("4. Cadastrar livro");
-        System.out.println("5. Sair");
-        System.out.print("Escolha uma opção: ");
+    // Method to display the menu
+    private static void displayMenu() {
+        System.out.println("Library:");
+        System.out.println("1. List books");
+        System.out.println("2. Rent book");
+        System.out.println("3. Return book");
+        System.out.println("4. Register book");
+        System.out.println("5. Exit");
+        System.out.print("Choose an option: ");
     }
 
-    // Método para listar livros
-    private static void listarLivros(PrintWriter escritorServidor, BufferedReader leitorServidor) throws IOException {
-        escritorServidor.println(COMANDO_LISTAR);
-        String respostaServidor;
-        while ((respostaServidor = leitorServidor.readLine()) != null) {
-            if (respostaServidor.isEmpty()) break;
-            System.out.println(respostaServidor);
+    private static void listBooks(PrintWriter serverWriter, BufferedReader serverReader) throws IOException {
+        serverWriter.println(COMMAND_LIST);
+        String serverResponse;
+        while ((serverResponse = serverReader.readLine()) != null) {
+            if (serverResponse.isEmpty()) break;
+            System.out.println(serverResponse);
         }
     }
 
-    // Método para alugar livro
-    private static void alugarLivro(PrintWriter escritorServidor, BufferedReader leitorServidor, Scanner scanner) throws IOException {
-        System.out.print("Nome do livro: ");
-        String nomeLivro = scanner.nextLine().trim();
-        if (nomeLivro.isEmpty()) {
-            System.out.println("Nome do livro não pode ser vazio.");
+    private static void rentBook(PrintWriter serverWriter, BufferedReader serverReader, Scanner scanner) throws IOException {
+        System.out.print("Book name: ");
+        String bookName = scanner.nextLine().trim();
+        if (bookName.isEmpty()) {
+            System.out.println("Book name cannot be empty.");
             return;
         }
-        escritorServidor.println(COMANDO_ALUGAR + "#" + nomeLivro);
-        String respostaServidor = leitorServidor.readLine();
-        System.out.println(respostaServidor);
+        serverWriter.println(COMMAND_RENT + "#" + bookName);
+        String serverResponse = serverReader.readLine();
+        System.out.println(serverResponse);
     }
 
-    // Método para devolver livro
-    private static void devolverLivro(PrintWriter escritorServidor, BufferedReader leitorServidor, Scanner scanner) throws IOException {
-        System.out.print("Nome do livro: ");
-        String nomeLivro = scanner.nextLine().trim();
-        if (nomeLivro.isEmpty()) {
-            System.out.println("Nome do livro não pode ser vazio.");
+    private static void returnBook(PrintWriter serverWriter, BufferedReader serverReader, Scanner scanner) throws IOException {
+        System.out.print("Book name: ");
+        String bookName = scanner.nextLine().trim();
+        if (bookName.isEmpty()) {
+            System.out.println("Book name cannot be empty.");
             return;
         }
-        escritorServidor.println(COMANDO_DEVOLVER + "#" + nomeLivro);
-        String respostaServidor = leitorServidor.readLine();
-        System.out.println(respostaServidor);
+        serverWriter.println(COMMAND_RETURN + "#" + bookName);
+        String serverResponse = serverReader.readLine();
+        System.out.println(serverResponse);
     }
 
-    // Método para cadastrar livro
-    private static void cadastrarLivro(PrintWriter escritorServidor, BufferedReader leitorServidor, Scanner scanner) throws IOException {
-        System.out.print("Autor: ");
-        String autorLivro = scanner.nextLine().trim();
-        if (autorLivro.isEmpty()) {
-            System.out.println("O autor não pode ser vazio.");
+    private static void registerBook(PrintWriter serverWriter, BufferedReader serverReader, Scanner scanner) throws IOException {
+        System.out.print("Author: ");
+        String bookAuthor = scanner.nextLine().trim();
+        if (bookAuthor.isEmpty()) {
+            System.out.println("Author cannot be empty.");
             return;
         }
 
-        System.out.print("Nome: ");
-        String nomeLivro = scanner.nextLine().trim();
-        if (nomeLivro.isEmpty()) {
-            System.out.println("O nome não pode ser vazio.");
+        System.out.print("Name: ");
+        String bookName = scanner.nextLine().trim();
+        if (bookName.isEmpty()) {
+            System.out.println("Name cannot be empty.");
             return;
         }
 
-        System.out.print("Gênero: ");
-        String generoLivro = scanner.nextLine().trim();
-        if (generoLivro.isEmpty()) {
-            System.out.println("O gênero não pode ser vazio.");
+        System.out.print("Genre: ");
+        String bookGenre = scanner.nextLine().trim();
+        if (bookGenre.isEmpty()) {
+            System.out.println("Genre cannot be empty.");
             return;
         }
 
-        System.out.print("Número de exemplares: ");
-        int numeroExemplares;
+        System.out.print("Number of copies: ");
+        int numberOfCopies;
         try {
-            numeroExemplares = Integer.parseInt(scanner.nextLine().trim());
-            if (numeroExemplares < 0) {
-                System.out.println("O número de exemplares não pode ser negativo.");
+            numberOfCopies = Integer.parseInt(scanner.nextLine().trim());
+            if (numberOfCopies < 0) {
+                System.out.println("Number of copies cannot be negative.");
                 return;
             }
         } catch (NumberFormatException e) {
-            System.out.println("Número de exemplares inválido.");
+            System.out.println("Invalid number of copies.");
             return;
         }
 
-        String informacoesLivro = autorLivro + "," + nomeLivro + "," + generoLivro + "," + numeroExemplares;
-        escritorServidor.println(COMANDO_CADASTRAR + "#" + informacoesLivro);
-        String respostaServidor = leitorServidor.readLine();
-        System.out.println(respostaServidor);
+        String bookInfo = bookAuthor + "," + bookName + "," + bookGenre + "," + numberOfCopies;
+        serverWriter.println(COMMAND_REGISTER + "#" + bookInfo);
+        String serverResponse = serverReader.readLine();
+        System.out.println(serverResponse);
     }
 }
+

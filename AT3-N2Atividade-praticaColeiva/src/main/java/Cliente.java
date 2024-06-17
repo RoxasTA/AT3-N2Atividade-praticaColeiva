@@ -8,7 +8,7 @@ import java.util.Scanner;
 public class Cliente {
 
     private static final String HOST = "localhost";
-    private static final int PORT = 1337;
+    private static final int PORT = 1223;
 
     private static final String OPTION_LIST_BOOKS = "1";
     private static final String OPTION_RENT_BOOK = "2";

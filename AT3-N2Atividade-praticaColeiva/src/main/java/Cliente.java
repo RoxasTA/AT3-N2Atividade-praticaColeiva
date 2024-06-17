@@ -34,6 +34,7 @@ public class Cliente {
                 displayMenu();
                 userOption = scanner.nextLine().trim();
 
+                // Enviar comando baseado na escolha do usuário e receber resposta
                 switch (userOption) {
                     case OPTION_LIST_BOOKS:
                         listBooks(serverWriter, serverReader);

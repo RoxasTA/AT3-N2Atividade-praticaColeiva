@@ -14,6 +14,7 @@ public class Book {
         this.samples = samples;
     }
 
+    // Getters e Setters
     public String getAuthor() {
         return author;
     }
@@ -46,6 +47,7 @@ public class Book {
         this.samples = samples;
     }
 
+    // Método para retornar uma representação em string do livro
     @Override
     public String toString() {
         return "Book{" +
